@@ -13,9 +13,9 @@ def get_R(infile,S,E):
     for s in S:
         for e in E:
             if s in R:
-                R[s].update({e:'N'})
+                R[s].update({e:[]})
             else: 
-                R.update({s:{e:'N'}}) 
+                R.update({s:{e:[]}}) 
 
     input = open(infile, "r")
     while True:
@@ -23,13 +23,13 @@ def get_R(infile,S,E):
         if not r_str:
             break
         r=r_str.split()
-        R[r[0]][r[1]]=r[2]
+        R[r[0]][r[1]].append(r[2])
     input.close()
 
-    # for s in S:
-    #     for e in E:
-    #         print(R[s][e],end=' ')
-    #     print()
+    for s in S:
+        for e in E:
+            print(R[s][e],end=' ')
+        print()
     return R
 
 def is_in(Ie,ia):
@@ -43,46 +43,42 @@ def e_close_i(J,R):
     bnr=len(J)
     i=0
     while i<bnr:
-        if(R[I[i]]['e']!='N'and not is_in(I,R[I[i]]['e'])):
+        if(R[I[i]]['e']!=[]):
             I=I+R[I[i]]['e']
-            # print(I)
-            bnr=bnr+1
+            I_set = set(I)
+            I = list(I_set)
+            bnr=len(I)
         i=i+1
-    
-    I_list = list(I)
-    I_list.sort()
-    I="".join(I_list)
-    return I
+    I.sort()
+    return ''.join(I)
 
 def e_close_j(I,a,R):
-    Ia=''
+    Ia=[]
     for i in I:
-        if(R[i][a]!='N'):
-            Ia=Ia+R[i][a]          
+        if(R[i][a]!=[]):
+            Ia=Ia+R[i][a]         
     return Ia
 
 
 def get_I(S,E,R):
-    Ie=[e_close_i('X',R)]
-    #print(Ie)
+    Ie=[e_close_i(['X'],R)]
     I={Ie[0]:{'e':Ie[0]}}
     for ie in Ie:
         for a in E[1:]:
-            j = e_close_j(ie,a,R)
-            #print(j)
+            j = e_close_j(list(ie),a,R)
             ia = e_close_i(j,R)
             I[ie].update({a:ia})
-            if(not is_in(Ie,ia) and not ia==''):
+            if(not is_in(Ie,ia) and not ia==[]):
                 Ie.append(ia)
                 I.update({ia:{'e':ia}})
     
     
     for ie in Ie:
         for a in E:
-            if(I[ie][a]==''):
+            if(I[ie][a]==[]):
                 print('$\t\t',end=' ')
             else:
-                print(I[ie][a]+'\t\t',end=' ')
+                print(I[ie][a],end=' ')
             # I_list=list(I[ie][a])
             # print(mat.format(I_list),end=' ')
             # print('\t\t',end=' ')
@@ -98,7 +94,7 @@ def get_DFA_I(Ie,E,I):
 
     for i in range(0,len(Ie)):
         for a in E:
-            if I[ Ie[i] ][a] == '':
+            if I[ Ie[i] ][a] == []:
                 DFA_I[i].update({a:'$'})
             else:
                 if i in DFA_I:
