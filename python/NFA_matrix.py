@@ -53,15 +53,9 @@ def e_close_i(J,R):
         if(R[I[i]]['e']!=[]):
             I=I+R[I[i]]['e']
             I = no_repeat(I)
-            print(I,end=' ')
             bnr=len(I)
-            print(bnr, end=' len of I')
-            print()
         i=i+1
     I.sort()
-    print(I,end=' get I')
-    print()
-    print()
     if(len(I)):
         return ''.join(I)
     else: 
