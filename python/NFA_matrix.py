@@ -38,6 +38,13 @@ def is_in(Ie,ia):
             return True
     return False
 
+def no_repeat(I):
+    res=[]
+    for i in I:
+        if i not in res:
+            res.append(i)
+    return res
+
 def e_close_i(J,R):
     I=J
     bnr=len(J)
@@ -45,12 +52,20 @@ def e_close_i(J,R):
     while i<bnr:
         if(R[I[i]]['e']!=[]):
             I=I+R[I[i]]['e']
-            I_set = set(I)
-            I = list(I_set)
+            I = no_repeat(I)
+            print(I,end=' ')
             bnr=len(I)
+            print(bnr, end=' len of I')
+            print()
         i=i+1
     I.sort()
-    return ''.join(I)
+    print(I,end=' get I')
+    print()
+    print()
+    if(len(I)):
+        return ''.join(I)
+    else: 
+        return '$'
 
 def e_close_j(I,a,R):
     Ia=[]
@@ -68,20 +83,14 @@ def get_I(S,E,R):
             j = e_close_j(list(ie),a,R)
             ia = e_close_i(j,R)
             I[ie].update({a:ia})
-            if(not is_in(Ie,ia) and not ia==[]):
+            if(not is_in(Ie,ia) and ia!='$'):
                 Ie.append(ia)
                 I.update({ia:{'e':ia}})
     
     
     for ie in Ie:
         for a in E:
-            if(I[ie][a]==[]):
-                print('$\t\t',end=' ')
-            else:
-                print(I[ie][a],end=' ')
-            # I_list=list(I[ie][a])
-            # print(mat.format(I_list),end=' ')
-            # print('\t\t',end=' ')
+            print(I[ie][a]+'\t\t',end=' ')
         print()
 
     return [Ie,I]
@@ -94,7 +103,7 @@ def get_DFA_I(Ie,E,I):
 
     for i in range(0,len(Ie)):
         for a in E:
-            if I[ Ie[i] ][a] == []:
+            if I[ Ie[i] ][a] == '$':
                 DFA_I[i].update({a:'$'})
             else:
                 if i in DFA_I:
