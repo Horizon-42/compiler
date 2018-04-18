@@ -50,18 +50,12 @@ def e_close_i(J,R):
     bnr=len(J)
     i=0
     while i<bnr:
-        if(R[I[i]]['e']!=[]):
+        if(not R[I[i]]['e']==[]):
             I=I+R[I[i]]['e']
             I = no_repeat(I)
-            print(I,end=' ')
             bnr=len(I)
-            print(bnr, end=' len of I')
-            print()
         i=i+1
     I.sort()
-    print(I,end=' get I')
-    print()
-    print()
     if(len(I)):
         return ''.join(I)
     else: 
@@ -71,7 +65,9 @@ def e_close_j(I,a,R):
     Ia=[]
     for i in I:
         if(R[i][a]!=[]):
-            Ia=Ia+R[i][a]         
+            Ia=Ia+R[i][a]  
+            Ia = no_repeat(Ia)  
+    Ia.sort()     
     return Ia
 
 
@@ -123,6 +119,7 @@ def get_DFA_I(Ie,E,I):
 
 if __name__ == '__main__':
     [S,E]=init('NFA.in')
+    print(S)
     R=get_R('NFA_R.in',S,E)
     print()
     [Ie,I]=get_I(S,E,R)
