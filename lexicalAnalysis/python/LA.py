@@ -11,6 +11,7 @@ operators = ("=", "+", "+=", "-", "-=", "*", "*=",
 relations = ("!=", "==", "<", ">", "<=", ">=")
 consts = []
 ids = []
+
 type_table = {1: keys, 2: delimiters,
               3: operators, 4: relations, 5: consts, 6: ids}
 
@@ -19,8 +20,8 @@ R = {}
 output = open("clean_code.c", "w", encoding="utf-8")
 
 
-def check(id, morphere):
-    assert id > 0
+def check(state, morphere):
+    assert state > 0
     try:
         pointer = type_table[id].index(morphere)
     except ValueError as Error:
@@ -29,22 +30,21 @@ def check(id, morphere):
             type_table[id] += [morphere]
         else:
             print("Wrong input: "+Error)
-    return pointer
+    return [id, pointer]
 
 
 def FSM(word, col):
     morphere = []
     start = 0  # 标记词素的起始位置
     end = 0  # 标记词素的结束
-    id = 0  # 标记词素类型 0为空
+    state = 0  # 标记词素类型 0为空
     for char in word:
         end += 1
-        id = R[id](char)
-        if id == 2 or id == 4:
-            pointer = check(id, word[start:end])
-            morphere.append([id, pointer])
+        state = R[state](char)
+        if state == 2 or state == 4:
+            morphere.append(check(state, word[start:end]))
             start = end  # 遍历下一个词素
-            id = 0
+            state = 0
 
 
 def line_to_words(line, row):
