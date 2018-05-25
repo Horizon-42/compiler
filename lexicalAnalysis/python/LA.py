@@ -5,22 +5,22 @@ keys = ("char", "double", "enum", "float", "int", "long", "short",
         "do", "while", "break", "continue", "if", "else", "goto",
         "switch", "case", "default", "return", "auto", "extern",
         "register", "static", "const", "sizeof", "typedef", "volatile")
-delimiters = (";", ",", "(", ")", "[", "]")
+delimiters = (";", ",", "(", ")", "[", "]")  # state 5,6,7,8,9,10
+#            11   12   13     15  16    18   19
 operators = ("=", "+", "+=", "-", "-=", "*", "*=",
+             #            21   22    24    25   27   28    30   31   32
              "/", "/=", "&", "&&", "|", "||", "!", ".", "->")
 relations = ("!=", "==", "<", ">", "<=", ">=")
 consts = []
-ids = []
+variables = []
 
 type_table = {1: keys, 2: delimiters,
-              3: operators, 4: relations, 5: consts, 6: ids}
-
-R = {}
+              3: operators, 4: relations, 5: consts, 6: variables}
 
 output = open("clean_code.c", "w", encoding="utf-8")
 
 
-def check(state, morphere):
+def check(state, morphere):  # 获取二元词素
     assert state > 0
     try:
         pointer = type_table[id].index(morphere)
@@ -33,18 +33,78 @@ def check(state, morphere):
     return [id, pointer]
 
 
+one_op = [";", ",", "(", ")", "[", "]", "."]
+two_op = ["=", "+", "-", "*", "/", "&", "|", "!", "<", ">"]
+
+# R = {0: empty, 1: name, 2: num, 3:string, 4:achar, 5: op, 6: ops, 7: end} # 8 表示错误
+
+
+def empty(char):
+    if char.isalpha() or char == '_':
+        return 1
+    elif char.isdigit():
+        return 2
+    elif char == '"':
+        return 3
+    elif char == "'":
+        return 4
+    elif char in one_op:
+        return 5
+    elif char in two_op:
+        return 6
+    return 8  # error
+
+
+def name(char):
+    if char.isalpha() or char.isdigit() or char == '_':
+        return 1
+    else:
+        return 0
+
+
+def num(char):
+    state = 0
+    return state
+
+
+def string(char):
+    return 0
+
+
+def achar(char):
+    return 0
+
+
+def op(char):
+    state = 0
+    return state
+
+
+def ops(char):
+    return 0
+
+
+def end(char):
+    return 0
+
+
+R = {0: empty, 1: name, 2: num, 3: string, 4: achar, 5: op, 6: ops, 7: end}
+
+
 def FSM(word, col):
     morphere = []
     start = 0  # 标记词素的起始位置
     end = 0  # 标记词素的结束
     state = 0  # 标记词素类型 0为空
     for char in word:
-        end += 1
         state = R[state](char)
-        if state == 2 or state == 4:
+        if state == 0:
             morphere.append(check(state, word[start:end]))
             start = end  # 遍历下一个词素
-            state = 0
+        elif state == 8:
+            pass  # 处理错误
+        else:
+            end += 1
 
 
 def line_to_words(line, row):
@@ -59,6 +119,8 @@ def line_to_words(line, row):
     #     print(i)
     if(line == ''):
         return []
+    if(re.match(r"^#include *<.*>.*$", line)):
+        line = re.sub(r"^#include *<.*> *", ',', line)
     words = line.split()
     col = 0
     for word in words:
