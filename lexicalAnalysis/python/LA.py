@@ -136,18 +136,6 @@ def single_char(char):
             state = 10
         else:
             state = 9  # 终态 单个字符
-    # if buffer[1] == '\\':
-
-    #     elif char == "'":
-    #         state = 9  # 终态 识别特殊字符
-    #     else:
-    #         state = 10  # 非终态 转义字符
-    # else:
-    #     if len(buffer) > 3:
-    #         state = 12
-    #         error = "too many chars in ''"
-    #     elif char == "'":
-    #         state = 9  # 终态 单个字符
 
 
 FSM = {0: empty, 2: name, 4: op, 6: const, 8: string, 10: single_char}
@@ -162,7 +150,7 @@ def get_index(id):
     return index
 
 
-def get_mor(row, line):
+def get_mor():
     global buffer, state, peek
     if state == 1:
         if buffer in keys:
@@ -190,7 +178,6 @@ def get_mor(row, line):
     elif state == 9:
         id = 8
         index = get_index(id)
-    output.write("%18s" % buffer + "\t\t" + 'at line %d \n' % row)
     buffer = ""
     state = 0
     peek = ' '
@@ -216,7 +203,8 @@ def scan(line, row):
             continue
         FSM[state](char)
         if state % 2 == 1:
-            mors.append(get_mor(row, next))
+            [id, pointer] = get_mor()
+            mors.append([id, pointer, row, col])
         elif state == 12:
             raise Exception(
                 "Syntax error: %s. %s at Line %d, col %d." % (error, buffer, row, col))
@@ -238,18 +226,26 @@ def main(infile):
             if not annotate:
                 if re.match(r"^.*/\*((?!\*/).)*$", line):
                     annotate = True
-                # output.write(line + '\n')
+                # 处理续行符号
+                if re.match(r"^#.*\\$", line):
+                    line = line.strip('\\')
                 mors += scan(line, row)
-            else:
-                if re.match(r"^((?!/\*).)*\*/.*$", line):
-                    annotate = False
-                    # output.write(line)
-                    mors += scan(line, row)
+            elif re.match(r"^((?!/\*).)*\*/.*$", line):
+                annotate = False
+                # 处理续行符号
+                if re.match(r"^#.*\\$", line):
+                    line = line.strip('\\')
+                mors += scan(line, row)
     except IOError as Error:
         print("File Error"+str(Error))
     except Exception as SyntaxError:
         print(str(SyntaxError))
+    return mors
 
 
 if __name__ == "__main__":
-    main("test.c")
+    mors = main("test.c")
+    for mor in mors:
+        output.write(str(mor)+'\n')
+    for str in strings:
+        print(str)
