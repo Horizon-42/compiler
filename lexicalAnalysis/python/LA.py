@@ -30,9 +30,6 @@ state = 0  # 当前状态
 error = "illegal name"
 
 
-output = open("res.c", "w", encoding="utf-8")
-
-
 def empty(char):
     global buffer, state, peek, error
     buffer += char
@@ -245,7 +242,15 @@ def main(infile):
 
 if __name__ == "__main__":
     mors = main("test.c")
-    for mor in mors:
-        output.write(str(mor)+'\n')
-    for str in strings:
-        print(str)
+    try:
+        output = open("res.txt", "w", encoding="utf-8")
+        Type = {1: "关键字", 2: "界符", 3: "算术运算符",
+                4: "关系运算符", 5: "常数", 6: "标识符", 7: "字符串", 8: "字符"}
+        output.write(
+            "单词              二元序列           位置（行，列）     类型              \n\n")
+        for mor in mors:
+            output.write("%-18s%-18s%-18s%-18s\n" %
+                         (type_table[mor[0]][mor[1]], "(%s, %s)" % (mor[0], mor[1]),
+                          "(%s, %s)" % (mor[2], mor[3]), Type[mor[0]], ))
+    except IOError as error:
+        print(error)
