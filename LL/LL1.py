@@ -180,6 +180,7 @@ def initM():
 
 
 def analysis(sym_str):
+    output = open("LL1.out", 'w', encoding="utf-8")
     sym_str += '#'
     syms = Stack()
     syms.push('#')
@@ -189,9 +190,10 @@ def analysis(sym_str):
     action = 'INIT'
     i = 0
     a = sym_str[i]
-    print("步骤              符号栈            输入串            所用产生式        动作              ")
-    print("%-18s%-18s%-18s%-18s%-18s" %
-          (step, syms, sym_str[i::], pro, action))
+    output.write(
+        "步骤              符号栈             输入串            所用产生式         动作              \n\n")
+    output.write("%-18s%-18s%-18s%-18s%-18s\n" %
+                 (step, syms, sym_str[i::], pro, action))
     while i < len(sym_str):
         step += 1
         pro = ''
@@ -220,8 +222,8 @@ def analysis(sym_str):
                     syms.push(v)
         else:
             raise ValueError('Syntactic Error: %s is not expected here' % a)
-        print("%-18s%-18s%-18s%-18s%-18s" %
-              (step, syms, sym_str[i::], pro, action))
+        output.write("%-18s%-18s%-18s%-18s%-18s\n" %
+                     (step, syms, sym_str[i::], pro, action))
 
     return False
 
