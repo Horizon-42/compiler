@@ -19,6 +19,12 @@ class Stack(object):
     def pop(self):
         return self.__items.pop()
 
+    def __str__(self):
+        s = ''
+        for a in self.__items:
+            s += a
+        return s
+
 
 if __name__ == '__main__':
     words = Stack()
